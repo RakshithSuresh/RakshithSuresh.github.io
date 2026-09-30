@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Rakshith Suresh, Analytics Engineer in Los Angeles. dbt, Snowflake, Databricks, Airflow, SQL, Python. Data models, ELT pipelines, and governed metrics.">
+<meta property="og:title" content="Rakshith Suresh | Analytics Engineer">
+<meta property="og:description" content="Tested data models, ELT pipelines, and governed metrics with dbt, Snowflake, Databricks, and Airflow.">
+<meta property="og:type" content="website">
+<style>html{scroll-behavior:smooth} body{margin:0} img{max-width:100%}</style>
+<title>Rakshith Suresh | Analytics Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column (max 1080px) led by a lineage-diagram hero; sections read like layers of a pipeline, source to gold. */
+:root{
+  --bg:#F5F7FA; --surface:#FFFFFF; --fg:#0E1A2B; --muted:#526076; --line:#DCE2EB;
+  --accent:#1D5BC4; --accent-soft:#E6EEFB;
+  --bronze:#A8622E; --silver:#6F7C8E; --gold:#B8860B;
+  --bronze-soft:#F6ECE3; --silver-soft:#EDF0F4; --gold-soft:#FBF3DC;
+  --ok:#1E7A4C;
+  --f-display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --f-body:'Public Sans', 'Segoe UI', system-ui, sans-serif;
+  --f-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A1320; --surface:#101C2E; --fg:#E7EDF6; --muted:#9AA9BF; --line:#22324A;
+  --accent:#7FAEFF; --accent-soft:#15284A;
+  --bronze:#D9935E; --silver:#AEB9C8; --gold:#E7BE55;
+  --bronze-soft:#2A1E15; --silver-soft:#1A2433; --gold-soft:#2B2410;
+  --ok:#5FD39A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1320; --surface:#101C2E; --fg:#E7EDF6; --muted:#9AA9BF; --line:#22324A;
+  --accent:#7FAEFF; --accent-soft:#15284A;
+  --bronze:#D9935E; --silver:#AEB9C8; --gold:#E7BE55;
+  --bronze-soft:#2A1E15; --silver-soft:#1A2433; --gold-soft:#2B2410;
+  --ok:#5FD39A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:20px;padding-block:0}
+.wrap{max-width:1080px;margin:0 auto}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+.mono{font-family:var(--f-mono)}
+
+/* nav */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-inline:-20px;padding:12px 20px}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--fg);text-decoration:none}
+.brand span{color:var(--accent)}
+.links{display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+.links a{color:var(--muted);text-decoration:none;font-weight:500}
+.links a:hover{color:var(--fg)}
+
+/* hero */
+.hero{padding-block:64px 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.eyebrow{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.hero h1{font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.02em;margin-top:14px}
+.hero .role{font-family:var(--f-display);font-weight:500;font-size:clamp(20px,2.4vw,26px);color:var(--muted);margin-top:10px}
+.hero p.lede{max-width:56ch;margin-top:18px;font-size:17px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;border:1.5px solid var(--accent);cursor:pointer;font-family:var(--f-body)}
+.btn.primary{background:var(--accent);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.meta{margin-top:18px;color:var(--muted);font-size:14px}
+
+/* lineage diagram */
+.dag{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.dag-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-bottom:16px;gap:8px;flex-wrap:wrap}
+.dag-head .live{display:inline-flex;align-items:center;gap:6px;color:var(--ok)}
+.dag-head .live:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.layers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative}
+.layer{border-radius:10px;padding:10px;border:1.5px solid var(--line);min-width:0}
+.layer h4{margin:0 0 8px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.layer .n{font-family:var(--f-mono);font-size:11.5px;padding:5px 7px;border-radius:6px;background:var(--surface);border:1px solid var(--line);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-src{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,transparent)} .l-src h4{color:var(--accent)}
+.l-br{background:var(--bronze-soft);border-color:color-mix(in srgb,var(--bronze) 45%,transparent)} .l-br h4{color:var(--bronze)}
+.l-si{background:var(--silver-soft);border-color:color-mix(in srgb,var(--silver) 45%,transparent)} .l-si h4{color:var(--silver)}
+.l-go{background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 50%,transparent)} .l-go h4{color:var(--gold)}
+.runlog{margin-top:16px;font-family:var(--f-mono);font-size:12.5px;line-height:1.75;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto}
+.runlog .p{color:var(--ok);font-weight:500}
+.runlog .d{color:var(--muted)}
+
+/* sections */
+section{padding-block:56px;border-top:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-size:clamp(28px,3.4vw,38px);font-weight:700;letter-spacing:-.01em}
+.sec-head .tag{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+
+/* about */
+.about{display:grid;grid-template-columns:1.3fr 1fr;gap:40px}
+.about p{max-width:62ch;margin:0 0 14px}
+.facts{display:grid;gap:12px;align-content:start}
+.fact{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:10px;font-size:15px}
+.fact b{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums;font-size:18px;color:var(--fg)}
+.fact span{color:var(--muted)}
+
+/* experience */
+.jobs{display:grid;gap:34px}
+.job{display:grid;grid-template-columns:200px 1fr;gap:28px}
+.job .when{font-family:var(--f-mono);font-size:13px;color:var(--muted);padding-top:4px}
+.job h3{font-size:22px;font-weight:700}
+.job .co{color:var(--accent);font-weight:600;margin-top:2px}
+.job ul{margin:12px 0 0;padding-left:18px;display:grid;gap:7px;max-width:72ch}
+.job li::marker{color:var(--muted)}
+.stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{font-family:var(--f-mono);font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+
+/* projects */
+.projects{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.proj.feature{grid-column:1 / -1}
+.proj h3{font-size:21px;font-weight:700}
+.proj .kind{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.proj p{margin:0;color:var(--fg);max-width:75ch}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--f-mono);font-size:12px}
+.flow .s{padding:4px 9px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.flow .s.br{border-color:color-mix(in srgb,var(--bronze) 50%,transparent);color:var(--bronze)}
+.flow .s.si{border-color:color-mix(in srgb,var(--silver) 50%,transparent);color:var(--silver)}
+.flow .s.go{border-color:color-mix(in srgb,var(--gold) 55%,transparent);color:var(--gold)}
+.flow .a{color:var(--muted)}
+.proj ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.proj .out{font-size:14px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+.proj .out b{color:var(--fg)}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.sk h3{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px}
+.sk .stack{margin-top:0}
+.sk .chip{color:var(--fg);font-size:12.5px}
+
+/* education + contact */
+.edu{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline}
+.edu h3{font-size:22px}
+.edu .sub{color:var(--muted)}
+.contact{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px;display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center}
+.contact h2{font-size:clamp(26px,3vw,34px)}
+.contact p{color:var(--muted);margin:10px 0 0;max-width:52ch}
+.clist{display:grid;gap:12px}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);min-width:0}
+.crow .v{font-family:var(--f-mono);font-size:13.5px;overflow-wrap:anywhere;min-width:0}
+.crow .k{font-size:12px;color:var(--muted);display:block;font-family:var(--f-body)}
+.copy{font:600 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer;flex-shrink:0}
+footer{padding-block:28px 40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero,.about,.contact{grid-template-columns:1fr}
+  .projects,.skills{grid-template-columns:1fr}
+  .job{grid-template-columns:1fr;gap:6px}
+  .hero{padding-block:40px 32px}
+}
+@media (max-width:520px){
+  .layers{grid-template-columns:repeat(2,1fr)}
+  .links{gap:12px;font-size:13px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .layer{animation:rise .6s ease both}
+  .layer:nth-child(2){animation-delay:.08s}.layer:nth-child(3){animation-delay:.16s}.layer:nth-child(4){animation-delay:.24s}
+  @keyframes rise{from{transform:translateY(6px)}to{transform:none}}
+}
+</style>
+</head>
+<body>
+
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">Rakshith<span>.</span></a>
+    <div class="links">
+      <a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Analytics Engineer · Los Angeles, CA</div>
+      <h1>Rakshith Suresh</h1>
+      <div class="role">I turn raw operational data into tested models and metrics people trust.</div>
+      <p class="lede">Analytics engineer with 4+ years across healthcare, retail, and IT operations. I build dbt models on Snowflake, Databricks, and Microsoft Fabric, orchestrate ELT with Airflow, and design star schemas and semantic layers that power self-serve BI.</p>
+      <div class="cta">
+        <a class="btn primary" href="#projects">See my projects</a>
+        <a class="btn ghost" href="https://github.com/RakshithSuresh" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+      <div class="meta">Open to Analytics Engineer and Data Engineer roles.</div>
+    </div>
+
+    <div class="dag" aria-label="Diagram of a medallion data pipeline">
+      <div class="dag-head"><span>models/ · medallion lineage</span><span class="live">last run passed</span></div>
+      <div class="layers">
+        <div class="layer l-src"><h4>Sources</h4><div class="n">postgres_cdc</div><div class="n">s3_events</div><div class="n">epic_ehr</div></div>
+        <div class="layer l-br"><h4>Bronze</h4><div class="n">raw_accounts</div><div class="n">raw_txns</div><div class="n">raw_encounters</div></div>
+        <div class="layer l-si"><h4>Silver</h4><div class="n">stg_customers</div><div class="n">stg_txns</div><div class="n">obt_orders</div></div>
+        <div class="layer l-go"><h4>Gold</h4><div class="n">dim_customers</div><div class="n">fct_transactions</div><div class="n">kpi_quality</div></div>
+      </div>
+      <div class="runlog" role="note">
+        <div><span class="d">$</span> dbt build --select career</div>
+        <div><span class="p">PASS</span> experience ........ 4+ years</div>
+        <div><span class="p">PASS</span> records_modeled ... 10M+</div>
+        <div><span class="p">PASS</span> quality_kpis ...... 60+</div>
+        <div><span class="p">PASS</span> manual_reporting .. −90%</div>
+        <div class="d">Done. 4 passed, 0 warnings, 0 errors.</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="sec-head"><h2>About</h2><span class="tag">source → model → metric</span></div>
+    <div class="about">
+      <div>
+        <p>I started as a data analyst building dashboards, and kept moving upstream to fix the problem at its source: messy, inconsistent data. Today most of my work happens in the layer between raw tables and reports, where I design data models, write tests, and define the metrics everyone else relies on.</p>
+        <p>At DAP Health I built a unified Epic clinical data model behind 60+ HEDIS and UDS quality measures. At Walmart I built dbt models in Snowflake that turned raw sales and inventory data into a governed star schema. On my own time I build end-to-end platforms with CDC, Kafka, Databricks, and Airflow to go deeper on the engineering side.</p>
+        <p>I hold an M.S. in Information Systems from California State University, Long Beach.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><span>Years in data</span><b>4+</b></div>
+        <div class="fact"><span>Records processed in one pipeline</span><b>10M+</b></div>
+        <div class="fact"><span>Dashboards delivered</span><b>55+</b></div>
+        <div class="fact"><span>Quality measures supported</span><b>60+</b></div>
+        <div class="fact"><span>Manual reporting removed</span><b>up to 90%</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-head"><h2>Experience</h2><span class="tag">most recent first</span></div>
+    <div class="jobs">
+      <article class="job">
+        <div class="when">Dec 2025 – Jul 2026</div>
+        <div>
+          <h3>Data Analytics Engineer</h3>
+          <div class="co">DAP Health</div>
+          <ul>
+            <li>Architected a unified Epic clinical data model integrating 8 source domains (encounters, appointments, screenings, immunizations, HIV care, prenatal, providers, departments), the single source of truth for 25+ Power BI dashboards and 60+ HEDIS/UDS measures.</li>
+            <li>Engineered a PySpark/SparkSQL pipeline in the Microsoft Fabric Lakehouse processing 10M+ Epic records for a dental treatment-completion program, retiring a manual Excel process.</li>
+            <li>Automated end-to-end healthcare reporting with SQL, reusable Fabric pipelines, and Power BI semantic models, cutting manual reporting effort by 80%.</li>
+            <li>Built provider-performance and scheduling-capacity data models with clinic-level drilldowns that drove staffing decisions.</li>
+            <li>Standardized KPI logic with clinical, quality, and operations stakeholders and validated every model through source reconciliation and patient-level Epic review.</li>
+          </ul>
+          <div class="stack"><span class="chip">Microsoft Fabric</span><span class="chip">PySpark</span><span class="chip">SparkSQL</span><span class="chip">SQL</span><span class="chip">Power BI</span><span class="chip">Epic</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when">Sep 2024 – Nov 2025</div>
+        <div>
+          <h3>Analytics Engineer</h3>
+          <div class="co">Walmart</div>
+          <ul>
+            <li>Built and maintained dbt models in Snowflake transforming raw sales and inventory data into a star schema of standardized fact and dimension tables, the governed source for Power BI and ad-hoc analytics.</li>
+            <li>Designed a self-service reporting layer that consolidated 10+ recurring reports into centralized Power BI dashboards for revenue, inventory, sell-through, stockouts, and fulfillment.</li>
+            <li>Defined and implemented 15+ KPIs with merchandising and operations teams as reusable metrics, surfacing stockout patterns that informed weekly business reviews.</li>
+            <li>Orchestrated ELT workflows with Python and Apache Airflow on AWS and Snowflake, eliminating 6–8 hours per week of manual preparation.</li>
+            <li>Implemented dbt tests and SQL reconciliation checks for nulls, duplicates, row counts, and key metrics.</li>
+          </ul>
+          <div class="stack"><span class="chip">dbt</span><span class="chip">Snowflake</span><span class="chip">Airflow</span><span class="chip">Python</span><span class="chip">AWS</span><span class="chip">Power BI</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when">Aug 2021 – Jul 2023</div>
+        <div>
+          <h3>Data Analyst</h3>
+          <div class="co">LTIMindtree Ltd.</div>
+          <ul>
+            <li>Built an operational analytics platform integrating 15+ CRM, ERP, and ticketing systems into a centralized reporting layer.</li>
+            <li>Developed unified SQL data models that standardized KPI definitions across departments.</li>
+            <li>Delivered 30+ Power BI and Tableau dashboards for SLA adherence, utilization, billing, backlog, and escalations.</li>
+            <li>Optimized Python and Airflow ETL workflows, strengthening validation and cutting data latency by about 55%.</li>
+            <li>Automated compliance and performance reporting with SQL and VBA, saving 25+ analyst hours per month.</li>
+          </ul>
+          <div class="stack"><span class="chip">SQL</span><span class="chip">Power BI</span><span class="chip">Tableau</span><span class="chip">Python</span><span class="chip">Airflow</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head"><h2>Projects</h2><span class="tag">end-to-end builds, code on GitHub</span></div>
+    <div class="projects">
+      <article class="proj feature">
+        <div class="kind">Lakehouse · Data engineering</div>
+        <h3>Databricks Lakehouse with Metadata-Driven dbt Pipelines</h3>
+        <div class="flow"><span class="s">PostgreSQL + S3</span><span class="a">→</span><span class="s br">Bronze · Delta CDC</span><span class="a">→</span><span class="s si">Silver · dbt tests + OBT</span><span class="a">→</span><span class="s go">Gold · Star schema SCD2</span></div>
+        <ul>
+          <li>Bronze ingests PostgreSQL and S3 into Delta Lake with cursor-based incremental CDC and primary-key upserts.</li>
+          <li>Silver runs dbt data-quality tests (uniqueness, not-null, ranges), ephemeral staging models, and a One Big Table compiled from Jinja, metadata-driven pipelines.</li>
+          <li>Gold uses dbt Snapshots to build a star schema with SCD Type 2 dimensions and fact tables.</li>
+        </ul>
+        <div class="stack"><span class="chip">Databricks</span><span class="chip">Delta Lake</span><span class="chip">dbt</span><span class="chip">Airflow</span><span class="chip">Docker</span><span class="chip">AWS S3</span><span class="chip">GitHub</span></div>
+        <div class="out"><b>Outcome:</b> a production-style lakehouse, containerized with Docker and orchestrated end to end with Airflow DAGs.</div>
+      </article>
+
+      <article class="proj">
+        <div class="kind">Streaming · CDC</div>
+        <h3>Modern Banking Data Platform</h3>
+        <div class="flow"><span class="s">Postgres WAL</span><span class="a">→</span><span class="s">Debezium · Kafka</span><span class="a">→</span><span class="s br">S3 Parquet</span><span class="a">→</span><span class="s go">Snowflake · dbt</span></div>
+        <ul>
+          <li>Captured changes from PostgreSQL with Debezium into Kafka topics; a Python consumer micro-batches 200K+ records into date-partitioned Parquet on S3.</li>
+          <li>Airflow loads Snowflake via external stages and COPY INTO, then runs dbt RAW, CURATED, and GOLD models: DIM_CUSTOMERS, DIM_ACCOUNTS, FCT_TRANSACTIONS with SCD Type 2.</li>
+        </ul>
+        <div class="stack"><span class="chip">Debezium</span><span class="chip">Kafka</span><span class="chip">Python</span><span class="chip">S3</span><span class="chip">Snowflake</span><span class="chip">dbt Cloud</span><span class="chip">Airflow</span></div>
+        <div class="out"><b>Outcome:</b> event-driven ingestion with dbt tests and custom checks on nulls, domain values, amounts, and business rules.</div>
+      </article>
+
+      <article class="proj">
+        <div class="kind">Analytics engineering · Finance</div>
+        <h3>SaaS Financial Analytics Pipeline</h3>
+        <div class="flow"><span class="s">Fivetran</span><span class="a">→</span><span class="s">BigQuery</span><span class="a">→</span><span class="s si">dbt Cloud</span><span class="a">→</span><span class="s go">Looker Studio</span></div>
+        <ul>
+          <li>Designed a Kimball star schema with incremental dbt models, data-quality tests, and SCD Type 2 for customers and subscriptions.</li>
+          <li>Built MRR, churn, LTV, CAC, and cohort metrics surfaced in automated executive dashboards.</li>
+        </ul>
+        <div class="stack"><span class="chip">Fivetran</span><span class="chip">BigQuery</span><span class="chip">dbt</span><span class="chip">Looker Studio</span></div>
+        <div class="out"><b>Outcome:</b> about 90% less manual financial reporting.</div>
+      </article>
+
+      <article class="proj">
+        <div class="kind">Semantic layer · AI</div>
+        <h3>AI Self-Service Analytics on Snowflake Cortex</h3>
+        <div class="flow"><span class="s">E-commerce data</span><span class="a">→</span><span class="s si">dbt facts &amp; dims</span><span class="a">→</span><span class="s go">Semantic layer</span><span class="a">→</span><span class="s">Streamlit</span></div>
+        <ul>
+          <li>Modeled customers, orders, products, payments, deliveries, and reviews into tested dbt models with a governed semantic layer of standard metrics.</li>
+          <li>Built a Streamlit app on Cortex Analyst for natural-language questions, and used AI_SENTIMENT, AI_CLASSIFY, and AI_SUMMARIZE_AGG to link review sentiment to delivery delays, refunds, and repeat purchases.</li>
+        </ul>
+        <div class="stack"><span class="chip">Snowflake Cortex</span><span class="chip">dbt</span><span class="chip">Streamlit</span></div>
+        <div class="out"><b>Outcome:</b> business users ask questions in plain English and get answers from verified, tested metrics.</div>
+      </article>
+
+      <article class="proj">
+        <div class="kind">Backend · LLM</div>
+        <h3>AI-Powered Data Analytics API</h3>
+        <div class="flow"><span class="s">CSV upload</span><span class="a">→</span><span class="s">LLM → Pandas</span><span class="a">→</span><span class="s si">Validate &amp; run</span><span class="a">→</span><span class="s go">Answer + chart</span></div>
+        <ul>
+          <li>FastAPI service that turns natural-language questions into LLM-generated Pandas code, validated against restricted operations and run on the full dataset.</li>
+          <li>Session-isolated datasets, AI-generated Matplotlib charts, and a SQLite history of every question, generated code, and result.</li>
+        </ul>
+        <div class="stack"><span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">Pandas</span><span class="chip">OpenAI API</span><span class="chip">SQLite</span></div>
+        <div class="out"><b>Outcome:</b> numbers come from real computation on the data, never from the model guessing.</div>
+      </article>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head"><h2>Skills</h2><span class="tag">what I use day to day</span></div>
+    <div class="skills">
+      <div class="sk"><h3>Modeling &amp; transformation</h3><div class="stack"><span class="chip">dbt</span><span class="chip">SQL</span><span class="chip">Kimball star schema</span><span class="chip">SCD Type 2</span><span class="chip">Medallion</span><span class="chip">Semantic layer</span><span class="chip">Data marts</span></div></div>
+      <div class="sk"><h3>Warehouses &amp; lakehouse</h3><div class="stack"><span class="chip">Snowflake</span><span class="chip">Databricks</span><span class="chip">Delta Lake</span><span class="chip">BigQuery</span><span class="chip">Microsoft Fabric</span><span class="chip">SQL Server</span><span class="chip">PostgreSQL</span></div></div>
+      <div class="sk"><h3>Pipelines &amp; orchestration</h3><div class="stack"><span class="chip">Airflow</span><span class="chip">Fivetran</span><span class="chip">Kafka</span><span class="chip">Debezium</span><span class="chip">AWS S3</span><span class="chip">Docker</span><span class="chip">Git</span></div></div>
+      <div class="sk"><h3>Programming</h3><div class="stack"><span class="chip">Python</span><span class="chip">Pandas</span><span class="chip">PySpark</span><span class="chip">SparkSQL</span><span class="chip">FastAPI</span></div></div>
+      <div class="sk"><h3>BI &amp; analytics</h3><div class="stack"><span class="chip">Power BI</span><span class="chip">DAX</span><span class="chip">Tableau</span><span class="chip">Looker Studio</span><span class="chip">Streamlit</span></div></div>
+      <div class="sk"><h3>AI &amp; domains</h3><div class="stack"><span class="chip">Snowflake Cortex</span><span class="chip">OpenAI API</span><span class="chip">Healthcare (Epic, HEDIS, UDS)</span><span class="chip">Retail</span></div></div>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="sec-head"><h2>Education</h2></div>
+    <div class="edu">
+      <div><h3>M.S. Information Systems</h3><div class="sub">California State University, Long Beach · GPA 3.7</div></div>
+      <div class="mono sub">Aug 2023 – May 2025</div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact">
+      <div>
+        <h2>Let's talk data.</h2>
+        <p>I'm looking for Analytics Engineer and Data Engineer roles. If you're hiring, or want to talk about dbt, lakehouses, or data modeling, reach out.</p>
+      </div>
+      <div class="clist">
+        <div class="crow"><div class="v"><span class="k">Email</span><span id="email">rakshithsuresh2112@gmail.com</span></div><button class="copy" id="copyEmail" type="button">Copy</button></div>
+        <div class="crow"><div class="v"><span class="k">GitHub</span><a href="https://github.com/RakshithSuresh" target="_blank" rel="noopener">github.com/RakshithSuresh</a></div></div>
+        <div class="crow"><div class="v"><span class="k">Location</span>Los Angeles, California</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer><span>© 2026 Rakshith Suresh</span><span class="mono">built like a pipeline: source → model → metric</span></footer>
+</div>
+
+<script>
+(function(){
+  var btn=document.getElementById('copyEmail');
+  btn.addEventListener('click',function(){
+    var t=document.getElementById('email').textContent;
+    var done=function(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy'},1600)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(document.getElementById('email'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected';setTimeout(function(){btn.textContent='Copy'},1600)};
+    try{navigator.clipboard.writeText(t).then(done,fallback)}catch(e){fallback()}
+  });
+})();
+</script>
+
+</body>
+</html>
